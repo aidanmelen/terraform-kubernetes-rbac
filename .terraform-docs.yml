@@ -1,0 +1,24 @@
+content: |-
+  {{ .Header }}
+
+  ## Usage
+
+  TODO
+
+  ```hcl
+  # {{ include "examples/complete/main.docs" }}
+  ```
+
+  Please see the [complete example](examples/complete) for more information.
+
+  {{ .Requirements }}
+
+  {{ .Providers }}
+
+  {{ .Modules }}
+
+  {{ .Resources }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}
