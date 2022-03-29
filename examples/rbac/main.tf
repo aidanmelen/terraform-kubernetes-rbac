@@ -1,17 +1,22 @@
 locals {
-  name = "ex-${replace(basename(path.cwd), "_", "-")}"
+  labels = {
+    "terraform-example"            = "ex-${replace(basename(path.cwd), "_", "-")}"
+    "app.kubernetes.io/managed-by" = "Terraform"
+    "terraform.io/module"          = "terraform-kubernetes-rbac"
+  }
 }
 
 resource "kubernetes_namespace" "development" {
   metadata {
-    name = "development"
+    name   = "development"
+    labels = local.labels
   }
 }
 
 module "rbac" {
   source = "../../"
 
-  labels = { "terraform-example" = local.name }
+  labels = local.labels
 
   roles = {
     # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-example

@@ -2,7 +2,7 @@ locals {
   labels = {
     "terraform-example"            = "ex-${replace(basename(path.cwd), "_", "-")}"
     "app.kubernetes.io/managed-by" = "Terraform"
-    "terraform.io/module"          = "terraform-kubernetes-service-account"
+    "terraform.io/module"          = "terraform-kubernetes-rbac"
   }
 }
 

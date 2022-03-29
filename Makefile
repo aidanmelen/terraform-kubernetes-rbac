@@ -1,4 +1,4 @@
-NAME = terraform-kubernetes-service-account
+NAME = terraform-kubernetes-rbac
 
 SHELL := /bin/bash
 

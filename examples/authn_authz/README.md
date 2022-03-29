@@ -3,15 +3,15 @@
 
 # Terraform Admin Example
 
-Create `terraform-admin` kuberenetes service account and pass the auth token to the kubernetes provider.
-These service account tokens will not expire and are ideal for deployments that take exceed 15 minutes.
+Create kuberenetes service account named `terraform-admin` and pass the secret auth token to the kubernetes provider.
+Service account tokens do not expire and are ideal for deployments that take exceed 15 minutes.
 
 ```hcl
 locals {
   labels = {
     "terraform-example"            = "ex-${replace(basename(path.cwd), "_", "-")}"
     "app.kubernetes.io/managed-by" = "Terraform"
-    "terraform.io/module"          = "terraform-kubernetes-service-account"
+    "terraform.io/module"          = "terraform-kubernetes-rbac"
   }
 }
 

@@ -1,5 +1,9 @@
 locals {
-  name = "ex-${replace(basename(path.cwd), "_", "-")}"
+  labels = {
+    "terraform-example"            = "ex-${replace(basename(path.cwd), "_", "-")}"
+    "app.kubernetes.io/managed-by" = "Terraform"
+    "terraform.io/module"          = "terraform-kubernetes-rbac"
+  }
 }
 
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-example
@@ -8,7 +12,7 @@ module "pod_reader" {
   source = "../../modules/rbac"
 
   create = true
-  labels = { "terraform-example" = local.name }
+  labels = local.labels
 
   role_name      = "pod-reader"
   role_namespace = "default"
@@ -38,7 +42,7 @@ module "secret_reader" {
   source = "../../modules/rbac"
 
   create = true
-  labels = { "terraform-example" = local.name }
+  labels = local.labels
 
   # at the HTTP level, the name of the resource for accessing Secret
   # objects is "secrets"
@@ -67,10 +71,8 @@ module "secret_reader" {
 
 resource "kubernetes_namespace" "development" {
   metadata {
-    name = "development"
-    labels = {
-      "terraform-example" = local.name
-    }
+    name   = "development"
+    labels = local.labels
   }
 }
 
@@ -80,7 +82,7 @@ module "secret_reader_global" {
   source = "../../modules/rbac"
 
   create = true
-  labels = { "terraform-example" = local.name }
+  labels = local.labels
 
   cluster_role_name = "secret-reader-global"
   # "namespace" omitted since ClusterRoles are not namespaced
@@ -107,7 +109,7 @@ module "terraform_admin_global" {
   source = "../../modules/rbac"
 
   create = true
-  labels = { "terraform-example" = local.name }
+  labels = local.labels
 
   create_cluster_role = false
   cluster_role_name   = "cluster-admin"
