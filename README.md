@@ -137,9 +137,7 @@ Please see the [rbac example](examples/rbac) for more information.
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | >= 2.7.0 |
+No providers.
 
 ## Modules
 
@@ -150,10 +148,7 @@ Please see the [rbac example](examples/rbac) for more information.
 
 ## Resources
 
-| Name | Type |
-|------|------|
-| [kubernetes_service_account_v1.sa](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/service_account_v1) | resource |
-| [kubernetes_secret.service_account](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/data-sources/secret) | data source |
+No resources.
 
 ## Inputs
 
@@ -162,11 +157,8 @@ Please see the [rbac example](examples/rbac) for more information.
 | <a name="input_annotations"></a> [annotations](#input\_annotations) | The global annotations. Applied to all resources. | `map(string)` | `{}` | no |
 | <a name="input_cluster_roles"></a> [cluster\_roles](#input\_cluster\_roles) | The cluster roles to bind to the service account. Set `create = false` to use pre-existing cluster role. | `any` | `{}` | no |
 | <a name="input_create"></a> [create](#input\_create) | Controls whether the Authorization and RBAC resources should be created (affects all resources). | `bool` | `true` | no |
-| <a name="input_create_service_account"></a> [create\_service\_account](#input\_create\_service\_account) | Whether to create a service account. | `string` | `true` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | The global labels. Applied to all resources. | `map(string)` | `{}` | no |
 | <a name="input_roles"></a> [roles](#input\_roles) | The roles to bind to the service account. Set `create = false` to use pre-existing role. | `any` | `{}` | no |
-| <a name="input_service_account_name"></a> [service\_account\_name](#input\_service\_account\_name) | The service account name. | `string` | `null` | no |
-| <a name="input_service_account_namespace"></a> [service\_account\_namespace](#input\_service\_account\_namespace) | The namespace in which the service account belongs. | `string` | `"default"` | no |
 
 ## Outputs
 
@@ -174,8 +166,6 @@ Please see the [rbac example](examples/rbac) for more information.
 |------|-------------|
 | <a name="output_cluster_roles"></a> [cluster\_roles](#output\_cluster\_roles) | The cluster roles. |
 | <a name="output_roles"></a> [roles](#output\_roles) | The roles. |
-| <a name="output_service_account_name"></a> [service\_account\_name](#output\_service\_account\_name) | The service account name. |
-| <a name="output_service_account_secrets"></a> [service\_account\_secrets](#output\_service\_account\_secrets) | The service account secret authentication data. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 ## License

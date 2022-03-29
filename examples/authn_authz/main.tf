@@ -1,16 +1,23 @@
 locals {
-  name = "ex-${replace(basename(path.cwd), "_", "-")}"
+  labels = {
+    "terraform-example"            = "ex-${replace(basename(path.cwd), "_", "-")}"
+    "app.kubernetes.io/managed-by" = "Terraform"
+    "terraform.io/module"          = "terraform-kubernetes-service-account"
+  }
+}
+
+resource "kubernetes_service_account_v1" "terraform_admin" {
+  metadata {
+    name      = "terraform-admin"
+    namespace = "kube-system"
+    labels    = local.labels
+  }
 }
 
 module "terraform_admin" {
   source = "../../"
 
-  labels = {
-    "terraform-example" = local.name
-  }
-
-  service_account_name      = "terraform-admin"
-  service_account_namespace = "kube-system"
+  labels = local.labels
 
   cluster_roles = {
     "cluster-admin" = {
@@ -19,16 +26,23 @@ module "terraform_admin" {
       cluster_role_binding_subjects = [
         {
           kind = "ServiceAccount"
-          name = "terraform-admin"
+          name = kubernetes_service_account_v1.terraform_admin.metadata[0].name
         }
       ]
     }
   }
 }
 
+data "kubernetes_secret" "terraform_admin" {
+  metadata {
+    name      = kubernetes_service_account_v1.terraform_admin.metadata[0].name
+    namespace = kubernetes_service_account_v1.terraform_admin.metadata[0].namespace
+  }
+}
+
 provider "kubernetes" {
   alias                  = "terraform-admin"
   host                   = "https://kubernetes.docker.internal:6443"
-  cluster_ca_certificate = module.terraform_admin.service_account_secrets["ca.crt"]
-  token                  = module.terraform_admin.service_account_secrets["token"]
+  cluster_ca_certificate = data.kubernetes_secret.terraform_admin.data["ca.crt"]
+  token                  = data.kubernetes_secret.terraform_admin.data["token"]
 }

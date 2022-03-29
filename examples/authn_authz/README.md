@@ -8,18 +8,25 @@ These service account tokens will not expire and are ideal for deployments that 
 
 ```hcl
 locals {
-  name = "ex-${replace(basename(path.cwd), "_", "-")}"
+  labels = {
+    "terraform-example"            = "ex-${replace(basename(path.cwd), "_", "-")}"
+    "app.kubernetes.io/managed-by" = "Terraform"
+    "terraform.io/module"          = "terraform-kubernetes-service-account"
+  }
+}
+
+resource "kubernetes_service_account_v1" "terraform_admin" {
+  metadata {
+    name      = "terraform-admin"
+    namespace = "kube-system"
+    labels    = local.labels
+  }
 }
 
 module "terraform_admin" {
   source = "../../"
 
-  labels = {
-    "terraform-example" = local.name
-  }
-
-  service_account_name      = "terraform-admin"
-  service_account_namespace = "kube-system"
+  labels = local.labels
 
   cluster_roles = {
     "cluster-admin" = {
@@ -28,18 +35,25 @@ module "terraform_admin" {
       cluster_role_binding_subjects = [
         {
           kind = "ServiceAccount"
-          name = "terraform-admin"
+          name = kubernetes_service_account_v1.terraform_admin.metadata[0].name
         }
       ]
     }
   }
 }
 
+data "kubernetes_secret" "terraform_admin" {
+  metadata {
+    name      = kubernetes_service_account_v1.terraform_admin.metadata[0].name
+    namespace = kubernetes_service_account_v1.terraform_admin.metadata[0].namespace
+  }
+}
+
 provider "kubernetes" {
   alias                  = "terraform-admin"
   host                   = "https://kubernetes.docker.internal:6443"
-  cluster_ca_certificate = module.terraform_admin.service_account_secrets["ca.crt"]
-  token                  = module.terraform_admin.service_account_secrets["token"]
+  cluster_ca_certificate = data.kubernetes_secret.terraform_admin.data["ca.crt"]
+  token                  = data.kubernetes_secret.terraform_admin.data["token"]
 }
 ```
 
@@ -66,7 +80,9 @@ provider "kubernetes" {
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | >= 2.7.0 |
 
 ## Modules
 
@@ -76,7 +92,10 @@ No providers.
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [kubernetes_service_account_v1.terraform_admin](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/service_account_v1) | resource |
+| [kubernetes_secret.terraform_admin](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/data-sources/secret) | data source |
 
 ## Inputs
 
@@ -86,9 +105,9 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_service_account_name"></a> [service\_account\_name](#output\_service\_account\_name) | The `terraform_admin` service account name. |
-| <a name="output_terraform_admin_auth_ca_crt"></a> [terraform\_admin\_auth\_ca\_crt](#output\_terraform\_admin\_auth\_ca\_crt) | The `terraform_admin` service account auth ca certificate. |
-| <a name="output_terraform_admin_auth_namespace"></a> [terraform\_admin\_auth\_namespace](#output\_terraform\_admin\_auth\_namespace) | The `terraform_admin` service account auth namespace. |
-| <a name="output_terraform_admin_auth_token"></a> [terraform\_admin\_auth\_token](#output\_terraform\_admin\_auth\_token) | The `terraform_admin` service account auth token. |
-| <a name="output_terraform_admin_rbac"></a> [terraform\_admin\_rbac](#output\_terraform\_admin\_rbac) | The `terraform_admin` service account RBAC. |
+| <a name="output_service_account_name"></a> [service\_account\_name](#output\_service\_account\_name) | The service account name. |
+| <a name="output_terraform_admin_auth_ca_crt"></a> [terraform\_admin\_auth\_ca\_crt](#output\_terraform\_admin\_auth\_ca\_crt) | The service account auth ca certificate. |
+| <a name="output_terraform_admin_auth_namespace"></a> [terraform\_admin\_auth\_namespace](#output\_terraform\_admin\_auth\_namespace) | The service account auth namespace. |
+| <a name="output_terraform_admin_auth_token"></a> [terraform\_admin\_auth\_token](#output\_terraform\_admin\_auth\_token) | The service account auth token. |
+| <a name="output_terraform_admin_rbac"></a> [terraform\_admin\_rbac](#output\_terraform\_admin\_rbac) | The service account RBAC. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

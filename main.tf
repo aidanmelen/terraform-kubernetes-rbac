@@ -5,6 +5,9 @@ module "roles" {
 
   create = try(each.value.create, true)
 
+  annotations = try(var.annotations, null)
+  labels      = try(var.labels, null)
+
   create_role    = try(each.value.create_role, true)
   role_name      = each.key
   role_namespace = try(each.value.role_namespace, null)
@@ -21,6 +24,9 @@ module "cluster_roles" {
   for_each = { for k, v in var.cluster_roles : k => v if var.create }
 
   create = try(each.value.create, true)
+
+  annotations = try(var.annotations, null)
+  labels      = try(var.labels, null)
 
   create_cluster_role = try(each.value.create_cluster_role, true)
   cluster_role_name   = each.key
