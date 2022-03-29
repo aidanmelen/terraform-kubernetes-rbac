@@ -1,6 +1,3 @@
-eks-admin-cluster-role-binding.yaml
-eks-admin-service-account.yaml
-config-map-aws-auth*.yaml
 kubeconfig_*
 .idea
 
@@ -49,4 +46,5 @@ terraform.rc
 go.mod
 go.sum
 examples/scratch
+examples/eks
 test/terraform_scratch_test.go

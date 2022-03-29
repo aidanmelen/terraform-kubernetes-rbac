@@ -43,11 +43,11 @@ locals {
     data.kubernetes_resource.role[0].object.metadata.name :
     null
   )
-  role_namespace = (
-    !var.create_role && var.role_name != null ?
-    data.kubernetes_resource.role[0].object.metadata.namespace :
-    null
-  )
+  # role_namespace = (
+  #   !var.create_role && var.role_name != null ?
+  #   data.kubernetes_resource.role[0].object.metadata.namespace :
+  #   null
+  # )
 }
 
 ################################################################################

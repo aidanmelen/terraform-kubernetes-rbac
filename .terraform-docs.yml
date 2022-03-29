@@ -6,10 +6,10 @@ content: |-
   TODO
 
   ```hcl
-  # {{ include "examples/complete/main.docs" }}
+  # {{ include "examples/rbac/main.tf" }}
   ```
 
-  Please see the [complete example](examples/complete) for more information.
+  Please see the [rbac example](examples/rbac) for more information.
 
   {{ .Requirements }}
 

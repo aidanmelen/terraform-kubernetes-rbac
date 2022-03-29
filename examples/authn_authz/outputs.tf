@@ -1,6 +1,6 @@
 output "service_account_name" {
   description = "The `terraform_admin` service account name."
-  value = module.terraform_admin.service_account_name
+  value       = module.terraform_admin.service_account_name
 }
 
 output "terraform_admin_auth_token" {
@@ -21,5 +21,6 @@ output "terraform_admin_auth_ca_crt" {
 }
 
 output "terraform_admin_rbac" {
-  value = module.terraform_admin.cluster_roles
+  description = "The `terraform_admin` service account RBAC."
+  value       = module.terraform_admin.cluster_roles
 }

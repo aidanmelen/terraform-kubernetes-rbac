@@ -17,18 +17,20 @@ variable "annotations" {
 }
 
 variable "create_service_account" {
-  type    = string
-  default = true
+  description = "Whether to create a service account."
+  type        = string
+  default     = true
 }
 
 variable "service_account_name" {
-  type     = string
-  default  = null
-  nullable = true
+  description = "The service account name."
+  type        = string
+  default     = null
+  nullable    = true
 }
 
 variable "service_account_namespace" {
-  description = "The namespace name."
+  description = "The namespace in which the service account belongs."
   type        = string
   default     = "default"
 }

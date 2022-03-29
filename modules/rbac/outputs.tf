@@ -2,7 +2,7 @@ output "role_name" {
   description = "The role name."
   value = (
     var.create && var.role_name != null ?
-    (var.create_role == true ? kubernetes_role_v1.r[0].metadata[0].name : local.role_name):
+    (var.create_role == true ? kubernetes_role_v1.r[0].metadata[0].name : local.role_name) :
     null
   )
 }
@@ -10,7 +10,7 @@ output "role_name" {
 output "role_namespace" {
   description = "The namespace in which the role belongs."
   value = (
-    var.create && var.role_namespace != null ? var.role_namespace:
+    var.create && var.role_namespace != null ? var.role_namespace :
     null
   )
 }
@@ -34,16 +34,16 @@ output "role_binding_namespace" {
 }
 
 output "cluster_role_name" {
-  description = ""
+  description = "The cluster role name."
   value = (
-    var.create &&  var.cluster_role_name != null ?
-    (var.create_cluster_role == true ? kubernetes_cluster_role_v1.cr[0].metadata[0].name : local.cluster_role_name):
+    var.create && var.cluster_role_name != null ?
+    (var.create_cluster_role == true ? kubernetes_cluster_role_v1.cr[0].metadata[0].name : local.cluster_role_name) :
     null
   )
 }
 
 output "cluster_role_binding_name" {
-  description = ""
+  description = "The cluster role binding name."
   value = (
     var.create && var.cluster_role_binding_subjects != null ?
     kubernetes_cluster_role_binding_v1.crb[0].metadata[0].name :

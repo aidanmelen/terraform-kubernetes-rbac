@@ -11,6 +11,171 @@ A Terraform module for managing [Kubernetes RBAC](https://kubernetes.io/docs/ref
 
 ## Usage
 
+TODO
+
+```hcl
+# locals {
+  name = "ex-${replace(basename(path.cwd), "_", "-")}"
+}
+
+resource "kubernetes_namespace" "development" {
+  metadata {
+    name = "development"
+  }
+}
+
+module "rbac" {
+  source = "../../"
+
+  labels = { "terraform-example" = local.name }
+
+  roles = {
+    # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-example
+    # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-example
+    "pod-reader" = {
+      role_namespace = "default"
+      role_rules = [
+        {
+          api_groups = [""]
+          resources  = ["pods"]
+          verbs      = ["get", "watch", "list"]
+        },
+      ]
+
+      # This role binding allows "jane" to read pods in the "default" namespace.
+      # You need to already have a Role named "pod-reader" in that namespace.
+      role_binding_name = "read-pods"
+      role_binding_subjects = [
+        {
+          kind     = "User"
+          name     = "jane" # Name is case sensitive
+          apiGroup = "rbac.authorization.k8s.io"
+        }
+      ]
+    },
+  }
+
+  cluster_roles = {
+    # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#clusterrole-example
+    # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-example
+    "secret-reader" = {
+      # at the HTTP level, the name of the resource for accessing Secret
+      # objects is "secrets"
+      # "namespace" omitted since ClusterRoles are not namespaced
+      cluster_role_rules = [
+        {
+          api_groups = [""]
+          resources  = ["secrets"]
+          verbs      = ["get", "watch", "list"]
+        },
+      ]
+
+      role_binding_name = "read-secret"
+      # The namespace of the RoleBinding determines where the permissions are granted.
+      # This only grants permissions within the "development" namespace.
+      role_binding_namespace = kubernetes_namespace.development.metadata[0].name
+      role_binding_subjects = [
+        {
+          kind     = "User"
+          name     = "dave" # Name is case sensitive
+          apiGroup = "rbac.authorization.k8s.io"
+        }
+      ]
+    },
+
+    # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#clusterrole-example
+    # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#clusterrolebinding-example
+    "secret-reader-global" = {
+      # "namespace" omitted since ClusterRoles are not namespaced
+      cluster_role_rules = [
+        {
+          api_groups = [""]
+          resources  = ["secrets"]
+          verbs      = ["get", "watch", "list"]
+        },
+      ]
+
+      # This cluster role binding allows anyone in the "manager" group to read secrets in any namespace.
+      cluster_role_binding_name = "read-secrets-global"
+      cluster_role_binding_subjects = [
+        {
+          kind     = "Group"
+          name     = "manager" # Name is case sensitive
+          apiGroup = "rbac.authorization.k8s.io"
+        }
+      ]
+    }
+  }
+}
+
+module "pre_exisiting_rbac" {
+  source = "../../"
+
+  cluster_roles = {
+    "cluster-admin" = {
+      create_cluster_role       = false
+      cluster_role_binding_name = "cluster-admin-global"
+      cluster_role_binding_subjects = [
+        {
+          kind = "User"
+          name = "bob"
+        }
+      ]
+    }
+  }
+}
+```
+
+Please see the [rbac example](examples/rbac) for more information.
+
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.1 |
+| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | >= 2.7.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | >= 2.7.0 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_cluster_roles"></a> [cluster\_roles](#module\_cluster\_roles) | ./modules/rbac | n/a |
+| <a name="module_roles"></a> [roles](#module\_roles) | ./modules/rbac | n/a |
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [kubernetes_service_account_v1.sa](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/service_account_v1) | resource |
+| [kubernetes_secret.service_account](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/data-sources/secret) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_annotations"></a> [annotations](#input\_annotations) | The global annotations. Applied to all resources. | `map(string)` | `{}` | no |
+| <a name="input_cluster_roles"></a> [cluster\_roles](#input\_cluster\_roles) | The cluster roles to bind to the service account. Set `create = false` to use pre-existing cluster role. | `any` | `{}` | no |
+| <a name="input_create"></a> [create](#input\_create) | Controls whether the Authorization and RBAC resources should be created (affects all resources). | `bool` | `true` | no |
+| <a name="input_create_service_account"></a> [create\_service\_account](#input\_create\_service\_account) | Whether to create a service account. | `string` | `true` | no |
+| <a name="input_labels"></a> [labels](#input\_labels) | The global labels. Applied to all resources. | `map(string)` | `{}` | no |
+| <a name="input_roles"></a> [roles](#input\_roles) | The roles to bind to the service account. Set `create = false` to use pre-existing role. | `any` | `{}` | no |
+| <a name="input_service_account_name"></a> [service\_account\_name](#input\_service\_account\_name) | The service account name. | `string` | `null` | no |
+| <a name="input_service_account_namespace"></a> [service\_account\_namespace](#input\_service\_account\_namespace) | The namespace in which the service account belongs. | `string` | `"default"` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_cluster_roles"></a> [cluster\_roles](#output\_cluster\_roles) | The cluster roles. |
+| <a name="output_roles"></a> [roles](#output\_roles) | The roles. |
+| <a name="output_service_account_name"></a> [service\_account\_name](#output\_service\_account\_name) | The service account name. |
+| <a name="output_service_account_secrets"></a> [service\_account\_secrets](#output\_service\_account\_secrets) | The service account secret authentication data. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 ## License

@@ -11,8 +11,9 @@ resource "kubernetes_namespace" "development" {
 module "rbac" {
   source = "../../"
 
-  roles = {
+  labels = { "terraform-example" = local.name }
 
+  roles = {
     # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-example
     # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-example
     "pod-reader" = {
@@ -39,7 +40,6 @@ module "rbac" {
   }
 
   cluster_roles = {
-
     # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#clusterrole-example
     # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-example
     "secret-reader" = {
@@ -96,6 +96,15 @@ module "pre_exisiting_rbac" {
   source = "../../"
 
   cluster_roles = {
-    "cluster-admin" = { create_cluster_role = false }
+    "cluster-admin" = {
+      create_cluster_role       = false
+      cluster_role_binding_name = "cluster-admin-global"
+      cluster_role_binding_subjects = [
+        {
+          kind = "User"
+          name = "bob"
+        }
+      ]
+    }
   }
 }

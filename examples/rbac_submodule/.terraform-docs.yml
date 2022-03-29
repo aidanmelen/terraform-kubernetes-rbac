@@ -6,7 +6,7 @@ content: |-
   Create RBAC resources using the sub-module directly.
 
   ```hcl
-  {{ include "main.tf.docs" }}
+  {{ include "main.tf" }}
   ```
 
   ## Running this module manually

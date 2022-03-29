@@ -5,6 +5,10 @@ locals {
 module "terraform_admin" {
   source = "../../"
 
+  labels = {
+    "terraform-example" = local.name
+  }
+
   service_account_name      = "terraform-admin"
   service_account_namespace = "kube-system"
 

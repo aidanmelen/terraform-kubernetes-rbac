@@ -7,7 +7,7 @@ content: |-
   These service account tokens will not expire and are ideal for deployments that take exceed 15 minutes.
 
   ```hcl
-  {{ include "main.tf.docs" }}
+  {{ include "main.tf" }}
   ```
 
   ## Running this module manually

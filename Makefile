@@ -18,12 +18,14 @@ run: ## Run docker dev container
 install: ## Install project
 	# terraform
 	terraform init
-	cd examples/basic && terraform init
-	cd examples/complete && terraform init
+	cd examples/authn_authz && terraform init
+	cd examples/rbac && terraform init
+	cd examples/rbac_submodule && terraform init
+	cd modules/rbac && terraform init
 
 	# terratest
 	go get github.com/gruntwork-io/terratest/modules/terraform
-	go mod init test/terraform_basic_test.go
+	go mod init test/terraform_authn_authz_test.go
 
 	# pre-commit
 	git init
@@ -35,22 +37,29 @@ lint:  ## Lint with pre-commit
 	pre-commit run
 	git add -A
 
-tests: test-basic test-complete ## Test with Terratest
+tests: test-authn-authz test-rbac test-rbac-submodule ## Test with Terratest
 
-test-basic:  ## Test Basic Example
-	go test test/terraform_basic_test.go -timeout 45m -v |& tee test/terraform_basic_test.log
+test-authn-authz:  ## Test Authn Authz Example
+	go test test/terraform_authn_authz_test.go -timeout 1m -v |& tee test/terraform_authn_authz_test.log
 
-test-complete: ## Test Complete Example
-	go test test/terraform_complete_test.go -timeout 45m -v |& tee test/terraform_complete_test.log
+test-rbac: ## Test RBAC Example
+	go test test/terraform_rbac_test.go -timeout 1m -v |& tee test/terraform_rbac_test.log
+
+test-rbac-submodule: ## Test RBAC Submodule Example
+	go test test/terraform_rbac_submodule_test.go -timeout 1m -v |& tee test/terraform_rbac_submodule_test.log
 
 clean: ## Clean project
 	@rm -f .terraform.lock.hcl
-	@rm -f examples/basic/.terraform.lock.hcl
-	@rm -f examples/complete/.terraform.lock.hcl
+	@rm -f examples/authn_authz/.terraform.lock.hcl
+	@rm -f examples/rbac/.terraform.lock.hcl
+	@rm -f examples/rbac_submodule/.terraform.lock.hcl
+	@rm -f modules/rbac/.terraform.lock.hcl
 
 	@rm -rf .terraform
-	@rm -rf examples/basic/.terraform
-	@rm -rf examples/complete/.terraform
+	@rm -rf examples/authn_authz/.terraform
+	@rm -rf examples/rbac/.terraform
+	@rm -rf examples/rbac_submodule/.terraform
+	@rm -rf modules/rbac/.terraform
 
 	@rm -f go.mod
 	@rm -f go.sum
