@@ -3,7 +3,7 @@
 
 # RBAC Example
 
-Recreate the RBAC examples from the [Using RBAC Authorization](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) on Kubernetes documentation.
+Recreate the Kubernetes RBAC examples from the [Using RBAC Authorization](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) documentation.
 
 ```hcl
 locals {

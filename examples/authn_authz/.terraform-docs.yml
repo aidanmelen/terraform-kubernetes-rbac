@@ -3,8 +3,8 @@ content: |-
 
   # Terraform Admin Example
 
-  Create kuberenetes service account named `terraform-admin` and pass the secret auth token to the kubernetes provider.
-  Service account tokens do not expire and are ideal for deployments that take exceed 15 minutes.
+  Create a Kubernetes service account named `terraform-admin` and pass the secret auth token to the [terraform-kubernetes-provider](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs).
+  Service account tokens do not expire and are ideal for terraform deployments that exceed 15 minutes.
 
   ```hcl
   {{ include "main.tf" }}
