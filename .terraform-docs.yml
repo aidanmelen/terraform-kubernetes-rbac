@@ -6,7 +6,7 @@ content: |-
     Recreate the RBAC examples from the [Using RBAC Authorization](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) on Kubernetes documentation.
 
   ```hcl
-  {{ include "main.tf" }}
+  {{ include "examples/rbac/main.tf" }}
   ```
 
   Please see the [rbac example](examples/rbac) for more information.
