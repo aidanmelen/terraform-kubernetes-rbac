@@ -17,13 +17,13 @@ variable "annotations" {
 }
 
 variable "roles" {
-  description = "The roles to bind to the service account. Set `create = false` to use pre-existing role."
+  description = "The roles to bind to the service account. Set `create_role = false` to use pre-existing role."
   type        = any
   default     = {}
 }
 
 variable "cluster_roles" {
-  description = "The cluster roles to bind to the service account. Set `create = false` to use pre-existing cluster role."
+  description = "The cluster roles to bind to the service account. Set `create_cluster_role = false` to use pre-existing cluster role."
   type        = any
   default     = {}
 }
