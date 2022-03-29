@@ -1,25 +1,38 @@
-variable "name" {
-  description = "The service account name."
-  type        = string
+variable "create" {
+  description = "Controls whether the Authorization and RBAC resources should be created (affects all resources)."
+  type        = bool
+  default     = true
 }
 
-variable "namespace" {
-  description = "The namespace name."
-  type        = string
-  default     = "default"
-}
-
-variable "additional_labels" {
-  description = "Additional labels."
+variable "labels" {
+  description = "The global labels. Applied to all resources."
   type        = map(string)
   default     = {}
 }
 
 variable "annotations" {
-  description = "The service account annotations."
+  description = "The global annotations. Applied to all resources."
   type        = map(string)
   default     = {}
 }
+
+variable "create_service_account" {
+  type    = string
+  default = true
+}
+
+variable "service_account_name" {
+  type     = string
+  default  = null
+  nullable = true
+}
+
+variable "service_account_namespace" {
+  description = "The namespace name."
+  type        = string
+  default     = "default"
+}
+
 
 variable "roles" {
   description = "The roles to bind to the service account. Set `create = false` to use pre-existing role."

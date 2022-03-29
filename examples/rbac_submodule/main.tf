@@ -1,15 +1,13 @@
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-example
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-example
 module "pod_reader" {
-  source = "../../modules/authorization"
+  source = "../../modules/rbac"
 
   create = true
 
-  # This role binding allows "jane" to read pods in the "default" namespace.
-  # You need to already have a Role named "pod-reader" in that namespace.
-  name      = "pod-reader"
-  namespace = "default"
-  rules = [
+  role_name      = "pod-reader"
+  role_namespace = "default"
+  role_rules = [
     {
       api_groups = [""]
       resources  = ["pods"]
@@ -17,8 +15,10 @@ module "pod_reader" {
     },
   ]
 
-  binding_name = "read-pods"
-  binding_subjects = [
+  # This role binding allows "jane" to read pods in the "default" namespace.
+  # You need to already have a Role named "pod-reader" in that namespace.
+  role_binding_name = "read-pods"
+  role_binding_subjects = [
     {
       kind     = "User"
       name     = "jane" # Name is case sensitive
@@ -30,15 +30,15 @@ module "pod_reader" {
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#clusterrole-example
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-example
 module "secret_reader" {
-  source = "../../modules/authorization"
+  source = "../../modules/rbac"
 
-  create = false
+  create = true
 
   # at the HTTP level, the name of the resource for accessing Secret
   # objects is "secrets"
-  name = "secret-reader"
+  cluster_role_name = "secret-reader"
   # "namespace" omitted since ClusterRoles are not namespaced
-  rules = [
+  cluster_role_rules = [
     {
       api_groups = [""]
       resources  = ["secrets"]
@@ -46,11 +46,11 @@ module "secret_reader" {
     },
   ]
 
-  binding_name = "read-secret"
+  role_binding_name = "read-secret"
   # The namespace of the RoleBinding determines where the permissions are granted.
   # This only grants permissions within the "development" namespace.
-  binding_namespace = kubernetes_namespace.development.metadata[0].name
-  binding_subjects = [
+  role_binding_namespace = kubernetes_namespace.development.metadata[0].name
+  role_binding_subjects = [
     {
       kind     = "User"
       name     = "dave" # Name is case sensitive
@@ -68,12 +68,12 @@ resource "kubernetes_namespace" "development" {
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#clusterrole-example
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#clusterrolebinding-example
 module "secret_reader_global" {
-  source = "../../modules/authorization"
+  source = "../../modules/rbac"
 
-  create = false
-  name = "secret-reader-global"
+  create            = true
+  cluster_role_name = "secret-reader-global"
   # "namespace" omitted since ClusterRoles are not namespaced
-  rules = [
+  cluster_role_rules = [
     {
       api_groups = [""]
       resources  = ["secrets"]
@@ -82,11 +82,28 @@ module "secret_reader_global" {
   ]
 
   # This cluster role binding allows anyone in the "manager" group to read secrets in any namespace.
-  binding_name = "read-secrets-global"
-  binding_subjects = [
+  cluster_role_binding_name = "read-secrets-global"
+  cluster_role_binding_subjects = [
     {
       kind     = "Group"
       name     = "manager" # Name is case sensitive
+      apiGroup = "rbac.authorization.k8s.io"
+    }
+  ]
+}
+
+module "terraform_admin_global" {
+  source = "../../modules/rbac"
+
+  create              = true
+  create_cluster_role = false
+  cluster_role_name   = "cluster-admin"
+
+  cluster_role_binding_name = "terraform-admin-global"
+  cluster_role_binding_subjects = [
+    {
+      kind     = "Group"
+      name     = "terraform-admin" # Name is case sensitive
       apiGroup = "rbac.authorization.k8s.io"
     }
   ]

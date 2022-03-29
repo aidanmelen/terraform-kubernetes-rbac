@@ -1,10 +1,6 @@
-locals {
-  name = "ex-${replace(basename(path.cwd), "_", "-")}"
-}
-
 module "service_account" {
-  source = "../../"
-  name   = local.name
+  source = "aidanmelen/service-account/kubernetes"
+  name   = "basic"
 }
 
 provider "kubernetes" {

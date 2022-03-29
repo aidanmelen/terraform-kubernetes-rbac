@@ -3,18 +3,18 @@
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-example
 ################################################################################
 resource "kubernetes_role_v1" "r" {
-  count = var.create && var.create_role && var.namespace != null ? 1 : 0
+  count = var.create && var.create_role == true && var.role_name != null ? 1 : 0
 
   metadata {
-    annotations   = var.annotations
+    annotations = var.annotations
     # generate_name = var.generate_name
-    labels        = var.labels
-    name          = var.name
-    namespace     = var.namespace
+    labels    = var.labels
+    name      = var.role_name
+    namespace = var.role_namespace
   }
 
   dynamic "rule" {
-    for_each = var.rules
+    for_each = var.role_rules
 
     content {
       api_groups     = lookup(rule.value, "api_groups", null)
@@ -25,22 +25,47 @@ resource "kubernetes_role_v1" "r" {
   }
 }
 
+data "kubernetes_resource" "role" {
+  count = var.create && !var.create_role == true && var.role_name != null ? 1 : 0
+
+  api_version = "rbac.authorization.k8s.io/v1"
+  kind        = "Role"
+
+  metadata {
+    name      = var.role_name
+    namespace = var.role_namespace
+  }
+}
+
+locals {
+  role_name = (
+    !var.create_role && var.role_name != null ?
+    data.kubernetes_resource.role[0].object.metadata.name :
+    null
+  )
+  role_namespace = (
+    !var.create_role && var.role_name != null ?
+    data.kubernetes_resource.role[0].object.metadata.namespace :
+    null
+  )
+}
+
 ################################################################################
 # Cluster Role
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#clusterrole-example
 ################################################################################
 resource "kubernetes_cluster_role_v1" "cr" {
-  count = var.create && var.create_role && var.namespace == null ? 1 : 0
+  count = var.create && var.create_cluster_role && var.cluster_role_name != null ? 1 : 0
 
   metadata {
-    annotations   = var.annotations
+    annotations = var.annotations
     # generate_name = var.generate_name
-    labels        = var.labels
-    name          = var.name
+    labels = var.labels
+    name   = var.cluster_role_name
   }
 
   dynamic "rule" {
-    for_each = var.rules
+    for_each = var.cluster_role_rules
 
     content {
       api_groups        = lookup(rule.value, "api_groups", null)
@@ -52,7 +77,7 @@ resource "kubernetes_cluster_role_v1" "cr" {
   }
 
   dynamic "aggregation_rule" {
-    for_each = var.aggregation_rules
+    for_each = var.cluster_role_aggregation_rules
 
     content {
       dynamic "cluster_role_selectors" {
@@ -77,40 +102,71 @@ resource "kubernetes_cluster_role_v1" "cr" {
   }
 }
 
+data "kubernetes_resource" "cluster_role" {
+  count = var.create && !var.create_cluster_role && var.cluster_role_name != null ? 1 : 0
+
+  api_version = "rbac.authorization.k8s.io/v1"
+  kind        = "ClusterRole"
+
+  metadata {
+    name = var.cluster_role_name
+  }
+}
+
+locals {
+  cluster_role_name = (
+    !var.create_cluster_role && var.cluster_role_name != null ?
+    data.kubernetes_resource.cluster_role[0].object.metadata.name :
+    null
+  )
+}
+
 ################################################################################
 # Role Bindings
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-example
 ################################################################################
+locals {
+  role_binding_namespace = (
+    var.role_binding_namespace != null ? var.role_binding_namespace : var.role_namespace
+  )
+}
+
 resource "kubernetes_role_binding_v1" "rb" {
-  count = var.create && var.binding_namespace != null ? 1 : 0
+  count = var.create && var.role_binding_subjects != null ? 1 : 0
 
   metadata {
     annotations = var.annotations
     # generate_name = var.generate_name
-    labels      = var.labels
-    name        = var.binding_name != null ? var.binding_name : var.name
-    namespace   = var.binding_namespace
+    labels    = var.labels
+    name      = var.role_binding_name != null ? var.role_binding_name : local.role_name
+    namespace = local.role_binding_namespace
   }
 
   role_ref {
     api_group = "rbac.authorization.k8s.io"
-    kind      = var.namespace != null ? "Role" : "ClusterRole"
+    kind      = var.role_namespace != null ? "Role" : "ClusterRole"
     name = (
-      var.namespace != null ?
-      var.create ? kubernetes_role_v1.r[0].metadata[0].name : var.name :
-      var.create ? kubernetes_cluster_role_v1.cr[0].metadata[0].name : var.name
+      var.role_namespace != null ?
+      var.create_role ? kubernetes_role_v1.r[0].metadata[0].name : local.role_name :
+      var.create_cluster_role ? kubernetes_cluster_role_v1.cr[0].metadata[0].name : local.cluster_role_name
     )
   }
 
   dynamic "subject" {
-    for_each = var.binding_subjects
+    for_each = var.role_binding_subjects
 
     content {
-      kind      = lookup(subject.value, "kind", null)
-      name      = lookup(subject.value, "name", var.name)
-      namespace = lookup(subject.value, "namespace", var.binding_namespace) # This value only applies to kind ServiceAccount.
-      api_group = lookup(subject.value, "api_group",                        # This value only applies to kind User and Group.
-        lookup(subject.value, "kind", null) == "User" || 
+      kind = lookup(subject.value, "kind", null)
+      name = lookup(subject.value, "name",
+        (
+          var.role_namespace != null ?
+          var.create_role ? kubernetes_role_v1.r[0].metadata[0].name : local.role_name :
+          var.create_cluster_role ? kubernetes_cluster_role_v1.cr[0].metadata[0].name : local.cluster_role_name
+        )
+      )
+      namespace = lookup(subject.value, "namespace", local.role_binding_namespace) # This value only applies to kind ServiceAccount.
+      api_group = lookup(subject.value, "api_group",                               # This value only applies to kind User and Group.
+        lookup(subject.value, "kind", null) == "User" ||
         lookup(subject.value, "kind", null) == "Group" ?
         "rbac.authorization.k8s.io" :
         null
@@ -124,30 +180,30 @@ resource "kubernetes_role_binding_v1" "rb" {
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-example
 ################################################################################
 resource "kubernetes_cluster_role_binding_v1" "crb" {
-  count = var.create && var.binding_namespace == null ? 1 : 0
+  count = var.create && var.cluster_role_binding_subjects != null ? 1 : 0
 
   metadata {
     annotations = var.annotations
     # generate_name = var.generate_name
-    labels      = var.labels
-    name        = var.binding_name != null ? var.binding_name : var.name
+    labels = var.labels
+    name   = var.cluster_role_binding_name != null ? var.cluster_role_binding_name : local.cluster_role_name
   }
 
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = var.create ? kubernetes_cluster_role_v1.cr[0].metadata[0].name : var.name
+    name      = var.create_cluster_role ? kubernetes_cluster_role_v1.cr[0].metadata[0].name : local.cluster_role_name
   }
 
   dynamic "subject" {
-    for_each = var.binding_subjects
+    for_each = var.cluster_role_binding_subjects
 
     content {
-      kind      = lookup(subject.value, "kind", "ClusterRole")
-      name      = lookup(subject.value, "name", var.name)
+      kind      = lookup(subject.value, "kind", null)
+      name      = lookup(subject.value, "name", local.cluster_role_name)
       namespace = lookup(subject.value, "namespace", null) # This value only applies to kind ServiceAccount.
       api_group = lookup(subject.value, "api_group",       # This value only applies to kind User and Group.
-        lookup(subject.value, "kind", null) == "User" || 
+        lookup(subject.value, "kind", null) == "User" ||
         lookup(subject.value, "kind", null) == "Group" ?
         "rbac.authorization.k8s.io" :
         null

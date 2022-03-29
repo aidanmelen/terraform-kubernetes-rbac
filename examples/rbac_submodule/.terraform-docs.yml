@@ -1,9 +1,9 @@
 content: |-
   {{ .Header }}
 
-  # Basic Example
+  # RBAC Sub-module Example
 
-  Create an kuberenetes service account and pass the auth token to the kubernetes provider.
+  Create RBAC resources using the sub-module directly.
 
   ```hcl
   {{ include "main.tf.docs" }}
@@ -21,7 +21,7 @@ content: |-
   1. Install [Terraform](https://www.terraform.io/) and make sure it's on your `PATH`.
   1. Install [Golang](https://golang.org/) and make sure this code is checked out into your `GOPATH`.
   1. `cd test`
-  1. `go test terraform_basic_test.go -v`
+  1. `go test terraform_rbac_submodule_test.go -v`
 
   {{ .Requirements }}
 
