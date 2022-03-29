@@ -100,7 +100,7 @@ module "rbac" {
   }
 }
 
-module "pre_exisiting_rbac" {
+module "pre_existing" {
   source = "../../"
 
   cluster_roles = {
@@ -149,7 +149,7 @@ module "pre_exisiting_rbac" {
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_pre_exisiting_rbac"></a> [pre\_exisiting\_rbac](#module\_pre\_exisiting\_rbac) | ../../ | n/a |
+| <a name="module_pre_existing"></a> [pre\_existing](#module\_pre\_existing) | ../../ | n/a |
 | <a name="module_rbac"></a> [rbac](#module\_rbac) | ../../ | n/a |
 
 ## Resources
@@ -166,5 +166,6 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_pre_existing"></a> [pre\_existing](#output\_pre\_existing) | The pre-existing roles, cluster roles, role bindings and cluster role bindings. |
 | <a name="output_rbac"></a> [rbac](#output\_rbac) | The roles, cluster roles, role bindings and cluster role bindings. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

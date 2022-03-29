@@ -92,7 +92,7 @@ module "rbac" {
   }
 }
 
-module "pre_exisiting_rbac" {
+module "pre_existing" {
   source = "../../"
 
   cluster_roles = {
