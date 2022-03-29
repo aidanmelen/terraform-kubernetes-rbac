@@ -11,118 +11,50 @@ A Terraform module for managing [Kubernetes RBAC](https://kubernetes.io/docs/ref
 
 ## Usage
 
-TODO
+Recreate the RBAC examples from the [Using RBAC Authorization](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) on Kubernetes documentation.
 
 ```hcl
-# locals {
-  name = "ex-${replace(basename(path.cwd), "_", "-")}"
+module "roles" {
+  source = "./modules/rbac"
+
+  for_each = { for k, v in var.roles : k => v if var.create }
+
+  create = try(each.value.create, true)
+
+  annotations = try(var.annotations, null)
+  labels      = try(var.labels, null)
+
+  create_role    = try(each.value.create_role, true)
+  role_name      = each.key
+  role_namespace = try(each.value.role_namespace, null)
+  role_rules     = try(each.value.role_rules, [])
+
+  role_binding_name      = try(each.value.role_binding_name, null)
+  role_binding_namespace = try(each.value.role_binding_namespace, null)
+  role_binding_subjects  = try(each.value.role_binding_subjects, null)
 }
 
-resource "kubernetes_namespace" "development" {
-  metadata {
-    name = "development"
-  }
-}
+module "cluster_roles" {
+  source = "./modules/rbac"
 
-module "rbac" {
-  source = "../../"
+  for_each = { for k, v in var.cluster_roles : k => v if var.create }
 
-  labels = { "terraform-example" = local.name }
+  create = try(each.value.create, true)
 
-  roles = {
-    # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-example
-    # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-example
-    "pod-reader" = {
-      role_namespace = "default"
-      role_rules = [
-        {
-          api_groups = [""]
-          resources  = ["pods"]
-          verbs      = ["get", "watch", "list"]
-        },
-      ]
+  annotations = try(var.annotations, null)
+  labels      = try(var.labels, null)
 
-      # This role binding allows "jane" to read pods in the "default" namespace.
-      # You need to already have a Role named "pod-reader" in that namespace.
-      role_binding_name = "read-pods"
-      role_binding_subjects = [
-        {
-          kind     = "User"
-          name     = "jane" # Name is case sensitive
-          apiGroup = "rbac.authorization.k8s.io"
-        }
-      ]
-    },
-  }
+  create_cluster_role = try(each.value.create_cluster_role, true)
+  cluster_role_name   = each.key
+  cluster_role_rules  = try(each.value.cluster_role_rules, [])
 
-  cluster_roles = {
-    # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#clusterrole-example
-    # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-example
-    "secret-reader" = {
-      # at the HTTP level, the name of the resource for accessing Secret
-      # objects is "secrets"
-      # "namespace" omitted since ClusterRoles are not namespaced
-      cluster_role_rules = [
-        {
-          api_groups = [""]
-          resources  = ["secrets"]
-          verbs      = ["get", "watch", "list"]
-        },
-      ]
+  cluster_role_binding_name     = try(each.value.cluster_role_binding_name, null)
+  cluster_role_binding_subjects = try(each.value.cluster_role_binding_subjects, null)
 
-      role_binding_name = "read-secret"
-      # The namespace of the RoleBinding determines where the permissions are granted.
-      # This only grants permissions within the "development" namespace.
-      role_binding_namespace = kubernetes_namespace.development.metadata[0].name
-      role_binding_subjects = [
-        {
-          kind     = "User"
-          name     = "dave" # Name is case sensitive
-          apiGroup = "rbac.authorization.k8s.io"
-        }
-      ]
-    },
-
-    # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#clusterrole-example
-    # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#clusterrolebinding-example
-    "secret-reader-global" = {
-      # "namespace" omitted since ClusterRoles are not namespaced
-      cluster_role_rules = [
-        {
-          api_groups = [""]
-          resources  = ["secrets"]
-          verbs      = ["get", "watch", "list"]
-        },
-      ]
-
-      # This cluster role binding allows anyone in the "manager" group to read secrets in any namespace.
-      cluster_role_binding_name = "read-secrets-global"
-      cluster_role_binding_subjects = [
-        {
-          kind     = "Group"
-          name     = "manager" # Name is case sensitive
-          apiGroup = "rbac.authorization.k8s.io"
-        }
-      ]
-    }
-  }
-}
-
-module "pre_existing" {
-  source = "../../"
-
-  cluster_roles = {
-    "cluster-admin" = {
-      create_cluster_role       = false
-      cluster_role_binding_name = "cluster-admin-global"
-      cluster_role_binding_subjects = [
-        {
-          kind = "User"
-          name = "bob"
-        }
-      ]
-    }
-  }
+  # Ignored when cluster_role_binding_name is provided
+  role_binding_name      = try(each.value.role_binding_name, null)
+  role_binding_namespace = try(each.value.role_binding_namespace, null)
+  role_binding_subjects  = try(each.value.role_binding_subjects, null)
 }
 ```
 

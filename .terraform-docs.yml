@@ -3,10 +3,10 @@ content: |-
 
   ## Usage
 
-  TODO
+    Recreate the RBAC examples from the [Using RBAC Authorization](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) on Kubernetes documentation.
 
   ```hcl
-  # {{ include "examples/rbac/main.tf" }}
+  {{ include "main.tf" }}
   ```
 
   Please see the [rbac example](examples/rbac) for more information.
