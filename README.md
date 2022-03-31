@@ -162,10 +162,10 @@ No resources.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_annotations"></a> [annotations](#input\_annotations) | The global annotations. Applied to all resources. | `map(string)` | `{}` | no |
-| <a name="input_cluster_roles"></a> [cluster\_roles](#input\_cluster\_roles) | The cluster roles and associated cluster role bindings or role bindings. | `any` | `{}` | no |
+| <a name="input_cluster_roles"></a> [cluster\_roles](#input\_cluster\_roles) | Map of cluster role and cluster/role binding definitions to create. | `any` | `{}` | no |
 | <a name="input_create"></a> [create](#input\_create) | Controls whether the Authorization and RBAC resources should be created (affects all resources). | `bool` | `true` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | The global labels. Applied to all resources. | `map(string)` | `{}` | no |
-| <a name="input_roles"></a> [roles](#input\_roles) | The roles and associated role bindings. | `any` | `{}` | no |
+| <a name="input_roles"></a> [roles](#input\_roles) | Map of role and role binding definitions to create. | `any` | `{}` | no |
 
 ## Outputs
 

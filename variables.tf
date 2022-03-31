@@ -17,13 +17,13 @@ variable "annotations" {
 }
 
 variable "roles" {
-  description = "The roles and associated role bindings."
+  description = "Map of role and role binding definitions to create."
   type        = any
   default     = {}
 }
 
 variable "cluster_roles" {
-  description = "The cluster roles and associated cluster role bindings or role bindings."
+  description = "Map of cluster role and cluster/role binding definitions to create."
   type        = any
   default     = {}
 }
