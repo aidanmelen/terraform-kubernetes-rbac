@@ -173,6 +173,8 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_pre_existing"></a> [pre\_existing](#output\_pre\_existing) | The pre-existing roles, cluster roles, role bindings and cluster role bindings. |
-| <a name="output_rbac"></a> [rbac](#output\_rbac) | The roles, cluster roles, role bindings and cluster role bindings. |
+| <a name="output_cluster_admin"></a> [cluster\_admin](#output\_cluster\_admin) | The `cluster-admin` pre-existing cluster role. |
+| <a name="output_pod_reader"></a> [pod\_reader](#output\_pod\_reader) | The `pod-reader` role. |
+| <a name="output_secret_reader"></a> [secret\_reader](#output\_secret\_reader) | The `secret-reader` cluster role. |
+| <a name="output_secret_reader_global"></a> [secret\_reader\_global](#output\_secret\_reader\_global) | The `secret-reader-global` cluster role. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

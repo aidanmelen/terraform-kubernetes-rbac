@@ -13,7 +13,7 @@ build: ## Build docker dev container
 	cd .devcontainer && docker build -f Dockerfile . -t $(NAME)
 
 run: ## Run docker dev container
-	docker run -it --rm -v "$$(pwd)":/workspaces/$(NAME) -v ~/.kube:/root/.kube -v ~/.cache/pre-commit:/root/.cache/pre-commit --workdir /workspaces/$(NAME) $(NAME) /bin/bash
+	docker run -it --rm -v "$$(pwd)":/workspaces/$(NAME) -v ~/.aws:/root/.aws -v ~/.kube:/root/.kube -v ~/.cache/pre-commit:/root/.cache/pre-commit --workdir /workspaces/$(NAME) $(NAME) /bin/bash
 
 install: ## Install project
 	# terraform
@@ -21,6 +21,7 @@ install: ## Install project
 	cd examples/authn_authz && terraform init
 	cd examples/rbac && terraform init
 	cd examples/rbac_submodule && terraform init
+	cd examples/eks && terraform init
 	cd modules/rbac && terraform init
 
 	# pre-commit
@@ -28,10 +29,23 @@ install: ## Install project
 	git add -A
 	pre-commit install
 
+	# terratest
+	go get github.com/gruntwork-io/terratest/modules/terraform
+	go mod init test/terraform_rbac_test.go
+
 lint:  ## Lint with pre-commit
 	git add -A
 	pre-commit run
 	git add -A
+
+test-authn-authz:  ## Test Authn Authz Example
+	go test test/terraform_authn_authz_test.go -timeout 1m -v |& tee test/terraform_authn_authz_test.log
+
+test-rbac: ## Test RBAC Example
+	go test test/terraform_rbac_test.go -timeout 1m -v |& tee test/terraform_rbac_test.log
+
+test-rbac-submodule: ## Test RBAC Submodule Example
+	go test test/terraform_rbac_submodule_test.go -timeout 1m -v |& tee test/terraform_rbac_submodule_test.log
 
 clean: ## Clean project
 	@rm -f .terraform.lock.hcl

@@ -46,5 +46,4 @@ terraform.rc
 go.mod
 go.sum
 examples/scratch
-examples/eks
 test/terraform_scratch_test.go
