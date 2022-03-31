@@ -3,7 +3,7 @@
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-example
 ################################################################################
 resource "kubernetes_role_v1" "r" {
-  count = var.create && var.create_role == true && var.role_name != null ? 1 : 0
+  count = var.create && var.create_role && var.role_name != null ? 1 : 0
 
   metadata {
     annotations = var.annotations
@@ -26,7 +26,7 @@ resource "kubernetes_role_v1" "r" {
 }
 
 data "kubernetes_resource" "role" {
-  count = var.create && !var.create_role == true && var.role_name != null ? 1 : 0
+  count = var.create && !var.create_role && var.role_name != null ? 1 : 0
 
   api_version = "rbac.authorization.k8s.io/v1"
   kind        = "Role"

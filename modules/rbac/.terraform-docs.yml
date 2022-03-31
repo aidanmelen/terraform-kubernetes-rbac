@@ -1,0 +1,26 @@
+content: |-
+  {{ .Header }}
+
+  # RBAC Module
+
+  ## Usage
+
+  Recreate the Kubernetes RBAC examples from the [Using RBAC Authorization](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) documentation.
+
+  ```hcl
+  {{ include "../../examples/rbac_submodule/main.tf" }}
+  ```
+
+  Please see the [rbac submodule example](examples/rbac_submodule/main.tf) for more information.
+
+  {{ .Requirements }}
+
+  {{ .Providers }}
+
+  {{ .Modules }}
+
+  {{ .Resources }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}

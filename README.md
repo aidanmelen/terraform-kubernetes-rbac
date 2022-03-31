@@ -30,6 +30,7 @@ resource "kubernetes_namespace" "development" {
 }
 
 module "rbac" {
+  # source = "aidan-melen/rbac/kubernetes"
   source = "../../"
 
   labels = local.labels
@@ -114,6 +115,7 @@ module "rbac" {
 }
 
 module "pre_existing" {
+  # source = "aidan-melen/rbac/kubernetes"
   source = "../../"
 
   cluster_roles = {
@@ -160,10 +162,10 @@ No resources.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_annotations"></a> [annotations](#input\_annotations) | The global annotations. Applied to all resources. | `map(string)` | `{}` | no |
-| <a name="input_cluster_roles"></a> [cluster\_roles](#input\_cluster\_roles) | The cluster roles to bind to the service account. Set `create_cluster_role = false` to use pre-existing cluster role. | `any` | `{}` | no |
+| <a name="input_cluster_roles"></a> [cluster\_roles](#input\_cluster\_roles) | The cluster roles and associated cluster role bindings or role bindings. | `any` | `{}` | no |
 | <a name="input_create"></a> [create](#input\_create) | Controls whether the Authorization and RBAC resources should be created (affects all resources). | `bool` | `true` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | The global labels. Applied to all resources. | `map(string)` | `{}` | no |
-| <a name="input_roles"></a> [roles](#input\_roles) | The roles to bind to the service account. Set `create_role = false` to use pre-existing role. | `any` | `{}` | no |
+| <a name="input_roles"></a> [roles](#input\_roles) | The roles and associated role bindings. | `any` | `{}` | no |
 
 ## Outputs
 

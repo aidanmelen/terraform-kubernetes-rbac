@@ -22,6 +22,7 @@ resource "kubernetes_namespace" "development" {
 }
 
 module "rbac" {
+  # source = "aidan-melen/rbac/kubernetes"
   source = "../../"
 
   labels = local.labels
@@ -106,6 +107,7 @@ module "rbac" {
 }
 
 module "pre_existing" {
+  # source = "aidan-melen/rbac/kubernetes"
   source = "../../"
 
   cluster_roles = {

@@ -9,6 +9,7 @@ locals {
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-example
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-example
 module "pod_reader" {
+  # source = "aidan-melen/rbac/kubernetes//modules/rbac"
   source = "../../modules/rbac"
 
   create = true
@@ -39,6 +40,7 @@ module "pod_reader" {
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#clusterrole-example
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-example
 module "secret_reader" {
+  # source = "aidan-melen/rbac/kubernetes//modules/rbac"
   source = "../../modules/rbac"
 
   create = true
@@ -79,6 +81,7 @@ resource "kubernetes_namespace" "development" {
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#clusterrole-example
 # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#clusterrolebinding-example
 module "secret_reader_global" {
+  # source = "aidan-melen/rbac/kubernetes//modules/rbac"
   source = "../../modules/rbac"
 
   create = true
@@ -106,6 +109,7 @@ module "secret_reader_global" {
 }
 
 module "terraform_admin_global" {
+  # source = "aidan-melen/rbac/kubernetes//modules/rbac"
   source = "../../modules/rbac"
 
   create = true

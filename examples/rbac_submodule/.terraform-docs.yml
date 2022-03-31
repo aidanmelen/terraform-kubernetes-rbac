@@ -3,7 +3,7 @@ content: |-
 
   # RBAC Sub-module Example
 
-  Create RBAC resources using the sub-module directly.
+  Recreate the Kubernetes RBAC examples from the [Using RBAC Authorization](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) documentation.
 
   ```hcl
   {{ include "main.tf" }}
