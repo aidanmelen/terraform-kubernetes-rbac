@@ -1,7 +1,7 @@
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 
-# Terraform Admin Example
+# Authn Authz Example
 
 Create a Kubernetes service account named `terraform-admin` and pass the secret auth token to the [terraform-kubernetes-provider](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs).
 Service account tokens do not expire and are ideal for terraform deployments that exceed 15 minutes.
@@ -70,7 +70,7 @@ provider "kubernetes" {
 1. Install [Terraform](https://www.terraform.io/) and make sure it's on your `PATH`.
 1. Install [Golang](https://golang.org/) and make sure this code is checked out into your `GOPATH`.
 1. `cd test`
-1. `go test terraform_terraform_admin_test.go -v`
+1. `go test terraform_authn_authz_test.go -v`
 
 ## Requirements
 
