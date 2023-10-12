@@ -29,7 +29,8 @@ module "cluster_roles" {
   labels      = try(var.labels, null)
 
   create_cluster_role = try(each.value.create_cluster_role, true)
-  cluster_role_name   = each.key
+  ### using cluster_role_name allow to use the same cluster role for rolebinding in different namespaces
+  cluster_role_name   = try(each.value.cluster_role_name, each.key)
   cluster_role_rules  = try(each.value.cluster_role_rules, [])
 
   cluster_role_binding_name     = try(each.value.cluster_role_binding_name, null)
